@@ -7,6 +7,9 @@
    id="svg839"
    sodipodi:docname="sycl_first_sample_code.svg"
    inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   inkscape:export-filename="sycl_first_sample_code.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -22,11 +25,11 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="pt"
-     inkscape:zoom="0.97916667"
-     inkscape:cx="110.80851"
-     inkscape:cy="233.3617"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
+     inkscape:zoom="1.9583333"
+     inkscape:cx="154.97873"
+     inkscape:cy="238.72341"
+     inkscape:window-width="1671"
+     inkscape:window-height="1050"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -372,24 +375,24 @@
      style="stroke-width:0.570874" />
   <text
      xml:space="preserve"
-     style="font-size:11.0341px;line-height:1;font-family:sans-serif;display:inline;stroke-width:0.919507"
+     style="font-size:11.0341px;line-height:1;font-family:sans-serif;display:inline;stroke-width:0.919507;fill:#118fa7;fill-opacity:1"
      x="136.85312"
      y="166.86363"
      id="text42034-8-0"><tspan
        id="tspan42032-5-9"
        x="136.85312"
        y="166.86363"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.0341px;font-family:sans-serif;fill:#1299b3;fill-opacity:1;stroke-width:0.919507">Execute code on the device</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.0341px;font-family:sans-serif;fill:#118fa7;fill-opacity:1;stroke-width:0.919507">Execute code on the device</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:11.0341px;line-height:1;font-family:sans-serif;display:inline;stroke-width:0.919507"
+     style="font-size:11.0341px;line-height:1;font-family:sans-serif;display:inline;stroke-width:0.919507;fill:#991e89;fill-opacity:1"
      x="58.326809"
      y="207.03423"
      id="text42034-8-0-7"><tspan
        id="tspan42032-5-9-5"
        x="58.326809"
        y="207.03423"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.0341px;font-family:sans-serif;fill:#1299b3;fill-opacity:1;stroke-width:0.919507">Wait for device to finish execution</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.0341px;font-family:sans-serif;fill:#991e89;fill-opacity:1;stroke-width:0.919507">Wait for device to finish execution</tspan></text>
   <rect
      style="display:inline;fill:#eff9fc;fill-opacity:1;stroke-width:6.23948;stroke-linecap:round;stroke-linejoin:bevel"
      id="rect16858-3-6"
@@ -398,7 +401,7 @@
      x="24.28833"
      y="146.50438" />
   <rect
-     style="display:inline;fill:#eff9fc;fill-opacity:1;stroke-width:1.55501;stroke-linecap:round;stroke-linejoin:bevel"
+     style="display:inline;fill:#f0aee7;fill-opacity:1;stroke-width:1.55501;stroke-linecap:round;stroke-linejoin:bevel"
      id="rect16858-3-6-2"
      width="29.723104"
      height="8.0440149"
@@ -436,14 +439,24 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.4926px;font-family:sans-serif;fill:#b38e05;fill-opacity:1;stroke-width:0.87438">Move data from the device to the host</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:10.2038px;line-height:1.25;font-family:sans-serif;display:inline;stroke-width:0.850312"
+     style="font-size:10.4926px;line-height:1.25;font-family:sans-serif;display:inline;fill:#1f9934;fill-opacity:1;stroke-width:0.87438"
+     x="73.934349"
+     y="263.44171"
+     id="text42034-8-2-9-5"><tspan
+       id="tspan42032-5-6-2-3"
+       x="73.934349"
+       y="263.44171"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.4926px;font-family:sans-serif;fill:#1f9934;fill-opacity:1;stroke-width:0.87438">Free the memory on the device to prevent leaks</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:10.2038px;line-height:1.25;font-family:sans-serif;display:inline;stroke-width:0.850312;fill:#a81010;fill-opacity:1"
      x="143.56082"
      y="91.888016"
      id="text42034"><tspan
        id="tspan42032"
        x="143.56082"
        y="91.888016"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2038px;font-family:sans-serif;fill:#cf1414;fill-opacity:1;stroke-width:0.850312">Device management with queues</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2038px;font-family:sans-serif;fill:#a81010;fill-opacity:1;stroke-width:0.850312">Device management with in order queue</tspan></text>
   <g
      fill="#237893"
      fill-opacity="1"
@@ -2147,6 +2160,13 @@
      height="7.8584638"
      x="25.708662"
      y="184.96445" />
+  <rect
+     style="display:inline;fill:#edf8ef;fill-opacity:1;stroke-width:3.30881;stroke-linecap:round;stroke-linejoin:bevel"
+     id="rect16858-3-0-8-6"
+     width="47.378632"
+     height="22.84943"
+     x="25.484043"
+     y="248.44148" />
   <g
      fill="#0000ff"
      fill-opacity="1"

@@ -72,7 +72,7 @@
 						* It is crucial that these errors are handled,
 							otherwise your application could fail in unpredictable ways.
 						* In SYCL there are two kinds of error:
-						  * Synchronous errors (thrown in user thread) .
+						  * Synchronous errors (thrown in user thread).
 						  * Asynchronous errors (thrown by the SYCL scheduler).
 					</div>
 				</section>
@@ -83,19 +83,14 @@
 					<div class="hbox" >
 						<code class="code-60pc"><pre>
 int main() {
+  constexpr static size_t N{10000};
   queue q();
 
   /* Synchronous code */
+  q.parallel_for&lt;add&gt;(N, [=](id&lt;1&gt; i) {
 
-  q.submit([&](handler &cgh) {
+  /* Asynchronous code */
 
-    /* Synchronous code */
-
-    cgh.parallel_for&lt;add&gt;(bufO.get_range(), [=](id&lt;1&gt; i) {
-
-      /* Asynchronous code */
-
-    });
   });
 }
 						</code></pre>
@@ -127,14 +122,10 @@ int main() {
   queue q();
 
   /* Synchronous code */ 
-
-  q.submit([&](handler &cgh) {
-    /* Synchronous code */
-
-    cgh.single_task&lt;add&gt;([=](id&lt;1&gt; i) {
-      /* Asynchronous code */
-    });
-  }).wait();
+  q.single_task&lt;add&gt;([=](id&lt;1&gt; i) {
+    /* Asynchronous code */
+  });
+  q.wait();
 }
 						</code></pre>
 					</div>
@@ -153,23 +144,25 @@ int main() {
 class add;
 
 int main() {
-  std::vector&lt;float&gt; dA{ 7, 5, 16, 8 }, dB{ 8, 16, 5, 7 }, dO{ 0, 0, 0, 0 };
+  std::vector&lt;int&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 }, hO{ 0, 0, 0, 0 };
   <mark>try {</mark>
-    queue gpuQueue(gpu_selector{});
+    queue gpuQueue(gpu_selector{}, property::queue::in_order());
+ 
+    constexpr std::size_t DEV_MEM_SIZE = size_of(float) * 4;
 
-    buffer bufA{dA};
-    buffer bufB{dB};
-    buffer bufO{dO};
+    int* dA = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
+    int* dB = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
+    int* dC = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue); 
 
-    gpuQueue.submit([&](handler &cgh) {
-      auto inA = accessor{bufA, cgh, read_only};
-      auto inB = accessor{bufB, cgh, read_only};
-      auto out = accessor{bufO, cgh, write_only};
+    gpuQueue.copy(hA.data(), dA, DEV_MEM_SIZE);
+    gpuQueue.copy(hB.data(), dB, DEV_MEM_SIZE);
 
-      cgh.parallel_for&lt;add&gt;(bufO.get_range(), [=](id&lt;1&gt; i) {
-        out[i] = inA[i] + inB[i];
-      });
-    }).wait();
+    gpuQueue.parallel_for&lt;add&gt;(DEV_MEM_SIZE, [=](id&lt;1&gt; i) {
+      dc[i] = dA[i] + dB[i];
+    });
+
+    gpuQueue.copy(dC, h0, DEV_MEM_SIZE);
+    gpuQueue.wait();
 
   <mark>} catch (...) { /* handle errors */ }</mark>
 }
@@ -187,25 +180,29 @@ int main() {
 class add;
 
 int main() {
-  std::vector&lt;float&gt; dA{ 7, 5, 16, 8 }, dB{ 8, 16, 5, 7 }, dO{ 0, 0, 0, 0 };
-  try{
-    queue gpuQueue(gpu_selector{}, <mark>async_handler{}</mark>);
-    buffer bufA{dA};
-    buffer bufB{dB};
-    buffer bufO{dO};
+  std::vector&lt;int&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 }, hO{ 0, 0, 0, 0 };
+  try {
+    queue gpuQueue(gpu_selector{}, property::queue::in_order(), <mark>async_handler{}</mark>);
+ 
+    constexpr std::size_t DEV_MEM_SIZE = size_of(float) * 4;
 
-    gpuQueue.submit([&](handler &cgh) {
-      auto inA = accessor{bufA, cgh, read_only};
-      auto inB = accessor{bufB, cgh, read_only};
-      auto out = accessor{bufO, cgh, write_only};
+    int* dA = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
+    int* dB = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
+    int* dC = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue); 
 
-      cgh.parallel_for&lt;add&gt;(bufO.get_range(), [=](id&lt;1&gt; i) {
-        out[i] = inA[i] + inB[i];
-      });
-    }).wait();
-  
+    gpuQueue.copy(hA.data(), dA, DEV_MEM_SIZE);
+  gpuQueue.copy(hB.data(), dB, DEV_MEM_SIZE);
+
+    gpuQueue.parallel_for&lt;add&gt;(DEV_MEM_SIZE, [=](id&lt;1&gt; i) {
+      dc[i] = dA[i] + dB[i];
+    });
+
+    gpuQueue.copy(dC, h0, DEV_MEM_SIZE);
+    gpuQueue.wait();
+
     <mark>gpuQueue.throw_asynchronous();</mark>
-  } catch (...) { /* handle errors */
+
+  } catch (...) { /* handle errors */ }
 }
 						</code></pre>
 					</div>
@@ -223,27 +220,30 @@ int main() {
 class add;
 
 int main() {
-  std::vector&lt;float&gt; dA{ 7, 5, 16, 8 }, dB{ 8, 16, 5, 7 }, dO{ 0, 0, 0, 0 };
-  try{
-    queue gpuQueue(gpu_selector{}, <mark>[=](exception_list eL) { 
-      for (auto e : eL) { std::rethrow_exception(e); }
+  std::vector&lt;int&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 }, hO{ 0, 0, 0, 0 };
+  try {
+    queue gpuQueue(gpu_selector{}, property::queue::in_order(), <mark>[=](exception_list eL) {
+    for (auto e : eL) { std::rethrow_exception(e); }
     }</mark>);
+ 
+    constexpr std::size_t DEV_MEM_SIZE = size_of(float) * 4;
 
-    buffer bufA{dA};
-    buffer bufB{dB};
-    buffer bufO{dO};
+    int* dA = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
+    int* dB = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
+    int* dC = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue); 
 
-    gpuQueue.submit([&](handler &cgh) {
-      auto inA = accessor{bufA, cgh, read_only};
-      auto inB = accessor{bufB, cgh, read_only};
-      auto out = accessor{bufO, cgh, write_only};
+    gpuQueue.copy(hA.data(), dA, DEV_MEM_SIZE);
+    gpuQueue.copy(hB.data(), dB, DEV_MEM_SIZE);
 
-      cgh.parallel_for&lt;add&gt;(bufO.get_range(), [=](id&lt;1&gt; i) {
-        out[i] = inA[i] + inB[i];
-      });
-    }).wait();
+    gpuQueue.parallel_for&lt;add&gt;(DEV_MEM_SIZE, [=](id&lt;1&gt; i) {
+      dc[i] = dA[i] + dB[i];
+    });
+
+    gpuQueue.copy(dC, h0, DEV_MEM_SIZE);
+    gpuQueue.wait();
 
     gpuQueue.throw_asynchronous();
+
   } catch (...) { /* handle errors */ }
 }
 						</code></pre>
@@ -259,7 +259,7 @@ int main() {
 						<div class="hbox">
 							<code class="code-60pc"><pre>
 int main() {
-  std::vector&lt;float&gt; dA{ 7, 5, 16, 8 }, dB{ 8, 16, 5, 7 }, dO{ 0, 0, 0, 0 };
+  std::vector&lt;float&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 }, hO{ 0, 0, 0, 0 };
   try {
     queue gpuQueue(gpu_selector{}, [=](exception_list eL) {
       for (auto e : eL) { std::rethrow_exception(e); }
@@ -285,7 +285,7 @@ int main() {
 						<div class="hbox">
 							<code class="code-60pc"><pre>
 int main() {
-  std::vector&lt;float&gt; dA{ 7, 5, 16, 8 }, dB{ 8, 16, 5, 7 }, dO{ 0, 0, 0, 0 };
+  std::vector&lt;float&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 }, hO{ 0, 0, 0, 0 };
   try {
     queue gpuQueue(gpu_selector{}, [=](exception_list eL) {
       for (auto e : eL) { std::rethrow_exception(e); }
@@ -317,7 +317,7 @@ int main() {
 						<div class="hbox">
 							<code class="code-60pc"><pre>
 int main() {
-  std::vector&lt;float&gt; dA{ 7, 5, 16, 8 }, dB{ 8, 16, 5, 7 }, dO{ 0, 0, 0, 0 };
+  std::vector&lt;float&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 }, hO{ 0, 0, 0, 0 };
 
   queue gpuQueue(gpu_selector{}, [=](exception_list eL) {
     for (auto e : eL) { std::rethrow_exception(e); }
@@ -389,26 +389,31 @@ int main() {
 class add;
 
 int main() {
-  std::vector&lt;float&gt; dA{ 7, 5, 16, 8 }, dB{ 8, 16, 5, 7 }, dO{ 0, 0, 0, 0 };
-  try{
-    queue <mark>hostQueue(aspect_selector&lt;aspect::host_debuggable&gt;()</mark>, async_handler{});
+  std::vector&lt;int&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 }, hO{ 0, 0, 0, 0 };
+  try {
+    queue hostQueue(property::queue::in_order(), <mark>cpu_selector_v</mark>, async_handler{}); 
+ 
+    constexpr std::size_t DEV_MEM_SIZE = size_of(float) * 4;
 
-    buffer bufA{dA};
-    buffer bufB{dB};
-    buffer bufO{dO};
+    int* dA = malloc_device&lt;int&gt;(DEV_MEM_SIZE, hostQueue);
+    int* dB = malloc_device&lt;int&gt;(DEV_MEM_SIZE, hostQueue);
+    int* dC = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gostQueue); 
 
-    hostQueue.submit([&](handler &cgh) {
-      auto inA = accessor{bufA, cgh, read_only};
-      auto inB = accessor{bufB, cgh, read_only};
-      auto out = accessor{bufO, cgh, write_only};
+    hostQueue.copy(hA.data(), dA, DEV_MEM_SIZE);
+    hostQueue.copy(hB.data(), dB, DEV_MEM_SIZE);
 
-      cgh.parallel_for&lt;add&gt;(bufO.get_range(), [=](id&lt;1&gt; i) {
-        out[i] = inA[i] + inB[i];
-      });
+    hostQueue.parallel_for&lt;add&gt;(DEV_MEM_SIZE, [=](id&lt;1&gt; i) {
+      dc[i] = dA[i] + dB[i];
     });
+
+    hostQueue.copy(dC, h0, DEV_MEM_SIZE);
+    hostQueue.wait();
+
     hostQueue.wait_and_throw();
+
   } catch (...) { /* handle errors */ }
 }
+
 						</code></pre>
 					</div>
 					<div class="bottom-bullets" data-markdown>
@@ -418,6 +423,7 @@ int main() {
 							with the requested aspects,
 							in this case a host debuggable device
 						* In SYCL 1.2.1, `host_selector` would be used instead, deprecated in SYCL 2020
+
 					</div>
 				</section>
 				<!--Slide 17-->

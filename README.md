@@ -1,7 +1,9 @@
 # SYCL Academy
 
-![SYCL Academy](sycl_academy_black.png#gh-light-mode-only "SYCL Academy")
-![SYCL Academy](sycl_academy_white.png#gh-dark-mode-only "SYCL Academy")
+<picture>
+  <source srcset="sycl_academy_white.png" media="(prefers-color-scheme: dark)">
+  <img src="sycl_academy_black.png" alt="SYCL Academy">
+</picture>
 
 This repository provides materials that can be used for teaching SYCL. The
 materials are provided using the "Creative Commons Attribution Share Alike 4.0

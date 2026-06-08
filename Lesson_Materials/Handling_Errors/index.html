@@ -22,7 +22,7 @@
 					window.addEventListener('load', () => {
 						let slides = document.getElementsByClassName("slide-background");
 
-						if (slides.length === 0) {
+						if (slides.length === 0) Error:  Logging at level: debug Configuration file: /github/workspace/./_config.yml GitHub Pages: github-pages v232 GitHub Pages: jekyll v3.10.0 Theme: jekyll-theme-primer Theme source: /usr/local/bundle/gems/jekyll-theme-primer-0.6.0 Requiring: jekyll-github-metadata Requiring: jekyll-seo-tag Requiring: jekyll-remote-theme Requiring: jekyll-coffeescript Requiring: jekyll-commonmark-ghpages Requiring: jekyll-gist Requiring: jekyll-github-metadata Requiring: jekyll-paginate Requiring: jekyll-relative-links Requiring: jekyll-optional-front-matter Requiring: jekyll-readme-index Requiring: jekyll-default-layout Requiring: jekyll-titles-from-headings Requiring: jekyll-remote-theme GitHub Metadata: Initializing... Source: /github/workspace/. Destination: /github/workspace/./_site Incremental build: disabled. Enable with --incremental Generating... Theme: pages-themes/github@v0.2.0 Theme source: /tmp/jekyll-remote-theme-20260608-9-ttmcts Remote Theme: Using theme pages-themes/github Remote Theme: Downloading https://codeload.github.com/pages-themes/github/zip/v0.2.0 to /tmp/jekyll-remote-theme-20260608-9-fv7gq7.zip github-pages 232 | Error: 404 - Not Found - Loading URL: https://codeload.github.com/pages-themes/github/zip/v0.2.0 {
 							slides = document.getElementsByClassName("pdf-page")
 						}
 
@@ -87,7 +87,7 @@ int main() {
   queue q();
 
   /* Synchronous code */
-  q.parallel_for&lt;add&gt;(N, [=](id&lt;1&gt; i) {
+  q.parallel_for(N, [=](id&lt;1&gt; i) {
 
   /* Asynchronous code */
 

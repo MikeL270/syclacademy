@@ -1,0 +1,18 @@
+--- --- @import "just-the-docs";
+
+/* SYSTEM DARK MODE BINDING */
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: #121212;
+    color: #e6e6e6;
+  }
+
+  .side-bar,
+  .main-header {
+    background-color: #1a1a1a;
+  }
+}

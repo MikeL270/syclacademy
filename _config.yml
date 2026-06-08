@@ -1,7 +1,4 @@
-remote_theme: just-the-docs/just-the-docs
-
-search_enabled: false 
-nav_enabled: false
+remote_theme: mmistakes/minimal-mistakes 
 
 plugins:
   - jekyll-remote-theme

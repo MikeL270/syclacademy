@@ -22,7 +22,7 @@
 					window.addEventListener('load', () => {
 						let slides = document.getElementsByClassName("slide-background");
 
-						if (slides.length === 0) Error:  Logging at level: debug Configuration file: /github/workspace/./_config.yml GitHub Pages: github-pages v232 GitHub Pages: jekyll v3.10.0 Theme: jekyll-theme-primer Theme source: /usr/local/bundle/gems/jekyll-theme-primer-0.6.0 Requiring: jekyll-github-metadata Requiring: jekyll-seo-tag Requiring: jekyll-remote-theme Requiring: jekyll-coffeescript Requiring: jekyll-commonmark-ghpages Requiring: jekyll-gist Requiring: jekyll-github-metadata Requiring: jekyll-paginate Requiring: jekyll-relative-links Requiring: jekyll-optional-front-matter Requiring: jekyll-readme-index Requiring: jekyll-default-layout Requiring: jekyll-titles-from-headings Requiring: jekyll-remote-theme GitHub Metadata: Initializing... Source: /github/workspace/. Destination: /github/workspace/./_site Incremental build: disabled. Enable with --incremental Generating... Theme: pages-themes/github@v0.2.0 Theme source: /tmp/jekyll-remote-theme-20260608-9-ttmcts Remote Theme: Using theme pages-themes/github Remote Theme: Downloading https://codeload.github.com/pages-themes/github/zip/v0.2.0 to /tmp/jekyll-remote-theme-20260608-9-fv7gq7.zip github-pages 232 | Error: 404 - Not Found - Loading URL: https://codeload.github.com/pages-themes/github/zip/v0.2.0 {
+						if (slides.length === 0) {
 							slides = document.getElementsByClassName("pdf-page")
 						}
 
@@ -82,6 +82,8 @@
 					</div>
 					<div class="hbox" >
 						<code class="code-60pc"><pre>
+#include &lt;sycl/sycl.hpp&gt;
+
 int main() {
   constexpr static size_t N{10000};
   queue q();
@@ -116,13 +118,13 @@ int main() {
 					</div>
 					<div class="hbox" >
 						<code class="code-60pc"><pre>
-class add;
+#include &lt;sycl/sycl.hpp&gt;
 
 int main() {
   queue q();
 
   /* Synchronous code */ 
-  q.single_task&lt;add&gt;([=](id&lt;1&gt; i) {
+  q.single_task([=](id&lt;1&gt; i) {
     /* Asynchronous code */
   });
   q.wait();
@@ -141,27 +143,26 @@ int main() {
 				<section>
 					<div class="hbox">
 						<code class="code-60pc"><pre>
-class add;
+#include &lt;sycl/sycl.hpp&gt;
 
 int main() {
-  std::vector&lt;int&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 }, hO{ 0, 0, 0, 0 };
+  std::vector&lt;int&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 };
   <mark>try {</mark>
-    queue gpuQueue(gpu_selector{}, property::queue::in_order());
+    queue gpuQueue(gpu_selector{});
  
-    constexpr std::size_t DEV_MEM_SIZE = size_of(float) * 4;
+    constexpr std::size_t DEV_MEM_SIZE = hA.size();
 
-    int* dA = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
-    int* dB = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
-    int* dC = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue); 
+    int* dA = malloc_shared&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
+    int* dB = malloc_shared&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
+    int* dC = malloc_shared&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
 
     gpuQueue.copy(hA.data(), dA, DEV_MEM_SIZE);
-    gpuQueue.copy(hB.data(), dB, DEV_MEM_SIZE);
+    gpuQueue.copy(hB.data(), dB DEV_MEM_SIZE);
 
-    gpuQueue.parallel_for&lt;add&gt;(DEV_MEM_SIZE, [=](id&lt;1&gt; i) {
+    gpuQueue.parallel_for(DEV_MEM_SIZE, [=](id&lt;1&gt; i) {
       dc[i] = dA[i] + dB[i];
     });
 
-    gpuQueue.copy(dC, h0, DEV_MEM_SIZE);
     gpuQueue.wait();
 
   <mark>} catch (...) { /* handle errors */ }</mark>
@@ -177,34 +178,32 @@ int main() {
 				<section>
 					<div class="hbox">
 						<code class="code-60pc"><pre>
-class add;
+#include &lt;sycl/sycl.hpp&gt;
 
 int main() {
-  std::vector&lt;int&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 }, hO{ 0, 0, 0, 0 };
+  std::vector&lt;int&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 };
   try {
-    queue gpuQueue(gpu_selector{}, property::queue::in_order(), <mark>async_handler{}</mark>);
+    queue gpuQueue(gpu_selector{}, <mark>async_handler{}</mark>);
  
-    constexpr std::size_t DEV_MEM_SIZE = size_of(float) * 4;
+    constexpr std::size_t DEV_MEM_SIZE = hA.size();
 
-    int* dA = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
-    int* dB = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
-    int* dC = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue); 
+    int* dA = malloc_shared&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
+    int* dB = malloc_shared&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
+    int* dC = malloc_shared&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
 
     gpuQueue.copy(hA.data(), dA, DEV_MEM_SIZE);
-  gpuQueue.copy(hB.data(), dB, DEV_MEM_SIZE);
+    gpuQueue.copy(hB.data(), dB DEV_MEM_SIZE);
 
-    gpuQueue.parallel_for&lt;add&gt;(DEV_MEM_SIZE, [=](id&lt;1&gt; i) {
+    gpuQueue.parallel_for(DEV_MEM_SIZE, [=](id&lt;1&gt; i) {
       dc[i] = dA[i] + dB[i];
     });
 
-    gpuQueue.copy(dC, h0, DEV_MEM_SIZE);
     gpuQueue.wait();
-
     <mark>gpuQueue.throw_asynchronous();</mark>
 
-  } catch (...) { /* handle errors */ }
+  <mark>} catch (...) { /* handle errors */ }</mark>
 }
-						</code></pre>
+              </code></pre>
 					</div>
 					<div class="bottom-bullets" data-markdown>
 							* Asynchronous errors errors that may have occurred will be thrown after a command group has been submitted to a `queue`.
@@ -217,29 +216,28 @@ int main() {
 				<section>
 					<div class="hbox">
 						<code class="code-60pc"><pre>
-class add;
+#include&lt;sycl/sycl.hpp&gt;
 
 int main() {
-  std::vector&lt;int&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 }, hO{ 0, 0, 0, 0 };
+  std::vector&lt;int&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 };
   try {
     queue gpuQueue(gpu_selector{}, property::queue::in_order(), <mark>[=](exception_list eL) {
     for (auto e : eL) { std::rethrow_exception(e); }
     }</mark>);
  
-    constexpr std::size_t DEV_MEM_SIZE = size_of(float) * 4;
+    constexpr std::size_t DEV_MEM_SIZE = hA.size();
 
-    int* dA = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
-    int* dB = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
-    int* dC = malloc_device&lt;int&gt;(DEV_MEM_SIZE, gpuQueue); 
+    int* dA = malloc_shared&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
+    int* dB = malloc_shared&lt;int&gt;(DEV_MEM_SIZE, gpuQueue);
+    int* dC = malloc_shared&lt;int&gt;(DEV_MEM_SIZE, gpuQueue); 
 
     gpuQueue.copy(hA.data(), dA, DEV_MEM_SIZE);
     gpuQueue.copy(hB.data(), dB, DEV_MEM_SIZE);
 
-    gpuQueue.parallel_for&lt;add&gt;(DEV_MEM_SIZE, [=](id&lt;1&gt; i) {
+    gpuQueue.parallel_for(DEV_MEM_SIZE, [=](id&lt;1&gt; i) {
       dc[i] = dA[i] + dB[i];
     });
 
-    gpuQueue.copy(dC, h0, DEV_MEM_SIZE);
     gpuQueue.wait();
 
     gpuQueue.throw_asynchronous();
@@ -259,7 +257,7 @@ int main() {
 						<div class="hbox">
 							<code class="code-60pc"><pre>
 int main() {
-  std::vector&lt;float&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 }, hO{ 0, 0, 0, 0 };
+  std::vector&lt;float&gt; hA{ 7, 5, 16, 8 }, hB{ 8, 16, 5, 7 };
   try {
     queue gpuQueue(gpu_selector{}, [=](exception_list eL) {
       for (auto e : eL) { std::rethrow_exception(e); }

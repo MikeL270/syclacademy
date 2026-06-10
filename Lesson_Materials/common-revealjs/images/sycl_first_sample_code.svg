@@ -25,11 +25,11 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="pt"
-     inkscape:zoom="1.9583333"
-     inkscape:cx="154.97873"
-     inkscape:cy="238.72341"
-     inkscape:window-width="1671"
-     inkscape:window-height="1050"
+     inkscape:zoom="0.48958333"
+     inkscape:cx="-33.702128"
+     inkscape:cy="52.085107"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -366,6 +366,7 @@
       </g>
     </g>
   </defs>
+<<<<<<< HEAD
   <path
      fill-rule="nonzero"
      fill="#ffffff"
@@ -373,6 +374,8 @@
      d="M 0.41019616,0.04879771 H 452.54283 V 302.89774 H 0.41019616 Z m 0,0"
      id="path55"
      style="stroke-width:0.570874" />
+=======
+>>>>>>> main
   <text
      xml:space="preserve"
      style="font-size:11.0341px;line-height:1;font-family:sans-serif;display:inline;stroke-width:0.919507;fill:#118fa7;fill-opacity:1"

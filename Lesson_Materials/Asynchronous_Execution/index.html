@@ -123,7 +123,7 @@ int main(){
   std::vector&lt;int&gt; hostA = { 1, 5, 66, 14, 55, 11, 12 }; 
   queue gpuQueue(gpu_selector_v);
 
-  int* devA = malloc_device&lt;int&gt;(1024, gpuQueue);
+  int* devA = malloc_device&lt;int&gt;(hostA.size(), gpuQueue);
 
   gpuQueue.memcpy(devA, hostA.data(), hostA.size())<mark>.wait();</mark>
 
@@ -147,19 +147,28 @@ int main(){
 					<div class="container">
 						<div class="col">
 							<pre><code class="language-cpp" data-line-numbers data-noescape>
-int* devA = malloc_device&lt;int&gt;(1024, gpuQueue));
+#include&lt;sycl/sycl.hpp&gt;
+#include&lt;vector&gt;
 
-gpuQueue.memcpy(devA, data, sizeof(int));
+using namespace sycl;
 
-<mark>gpuQueue.wait();</mark>
+int main(){ 
+  std::vector&lt;int&gt; hostA = { 1, 5, 66, 14, 55, 11, 12 };
+  queue gpuQueue(gpu_selector_v);
 
-gpuQueue.parallel_for(sycl::range{1024},
-  [=](sycl::id&lt;1&gt; idx){
-  devA[idx] = /* some computation */
-});
+  int* devA = malloc_device&lt;int&gt;(hostA.size(), gpuQueue));
 
-<mark>gpuQueue.wait();</mark>
-							</code></pre>
+  gpuQueue.memcpy(devA, hostA.data(), hostA.size());
+
+  <mark>gpuQueue.wait();</mark>
+
+  gpuQueue.parallel_for(hostA.size(), [=](id&lt;1&gt; idx){
+    devA[idx]++;
+  });
+
+  <mark>gpuQueue.wait();</mark>
+}
+              </code></pre>
 						</div>
 						<div class="col" data-markdown>
 							* Again calling `wait` or `wait_and_throw` on a `queue` will wait for all commands enqueued to it to complete.
@@ -188,8 +197,8 @@ gpuQueue.parallel_for(sycl::range{1024},
 						<div class="col">
 							<pre><code class="language-cpp">
 gpuQueue.memcpy(data, devicePtr, sizeof(int))<mark>.wait();</mark>
-							</code></pre>
-							<code class="code-100pc">
+							</pre></code>
+							<pre><code class="language-cpp">
 gpuQueue.memcpy(data, devicePtr, sizeof(int));
 <mark>gpuQueue.wait();</mark>
 							</code></pre>
